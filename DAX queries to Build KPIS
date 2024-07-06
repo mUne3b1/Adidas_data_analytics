@@ -1,0 +1,89 @@
+# DAX Measures for Adidas Sales Analysis KPIs
+
+# Measure for Overall Total Sales
+Overall_Total_Sales = SUM('Adidas_US_Sales'[Total sales])
+
+# Measure for Total Units Sold
+Overall_Total_Units_Sold = SUM('Adidas_US_Sales'[Total units sold])
+
+# Measure for Average Operating Margin
+Average_Operating_Margin = AVERAGE('Adidas_US_Sales'[Average operating margin])
+
+# Measure for Current Inventory Levels
+Current_Inventory = SUM('Inventory_Management'[Total units sold])
+
+# Measure for Top Selling Region
+Top_Selling_Region = 
+VAR RegionSales = 
+    SUMMARIZE(
+        'regional_sales',
+        'regional_sales'[Region],
+        "Total_Sales", SUM('regional_sales'[Total sales])
+    )
+VAR TopRegion = 
+    TOPN(
+        1,
+        RegionSales,
+        [Total_Sales], DESC
+    )
+RETURN
+    MAXX(TopRegion, 'regional_sales'[Region])
+
+# Measure for Top Product Category
+Top_Product_Category = 
+VAR CategorySales = 
+    SUMMARIZE(
+        'Product Category Sales Comparison',
+        'Product Category Sales Comparison'[Category],
+        "Total_Sales", SUM('Product Category Sales Comparison'[Total sales])
+    )
+VAR TopCategory = 
+    TOPN(
+        1,
+        CategorySales,
+        [Total_Sales], DESC
+    )
+RETURN
+    MAXX(TopCategory, 'Product Category Sales Comparison'[Category])
+
+# Measure for Highest Sales Month
+Highest_Sales_Month = 
+VAR MonthlySales = 
+    SUMMARIZE(
+        'Monthly Sales and Profit Trends',
+        'Monthly Sales and Profit Trends'[Year],
+        'Monthly Sales and Profit Trends'[Month],
+        "Total_Sales", SUM('Monthly Sales and Profit Trends'[Total sales])
+    )
+VAR TopMonth = 
+    TOPN(
+        1,
+        MonthlySales,
+        [Total_Sales], DESC
+    )
+RETURN
+    MAXX(TopMonth, CONCATENATE('Monthly Sales and Profit Trends'[Year], "-" & 'Monthly Sales and Profit Trends'[Month]))
+
+# Measure for Most Effective Sales Method
+Most_Effective_Sales_Method = 
+VAR MethodSales = 
+    SUMMARIZE(
+        'Impact of Discounts and Promotions',
+        'Impact of Discounts and Promotions'[Sales method],
+        "Total_Sales", SUM('Impact of Discounts and Promotions'[Total sales])
+    )
+VAR TopMethod = 
+    TOPN(
+        1,
+        MethodSales,
+        [Total_Sales], DESC
+    )
+RETURN
+    MAXX(TopMethod, 'Impact of Discounts and Promotions'[Sales method])
+
+# Measure for Total Inventory Turnover
+Total_Inventory_Turnover = 
+DIVIDE(
+    SUM('Inventory Management'[Total units sold]),
+    AVERAGE('Inventory Management'[Safety_Stock])
+)
